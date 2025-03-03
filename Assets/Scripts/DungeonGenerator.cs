@@ -9,40 +9,86 @@ public class DungeonGenerator : MonoBehaviour
     public int splitCount = 20;
     public Vector2 minRoomSize;
     public Vector2 maxRoomSize;
+
+    private bool done;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        StartCoroutine(GenerateDungeon());
+        //StartCoroutine(GenerateDungeon());
     }
 
     [Button]
     void SplitVertically()
     {
-        RectInt room = rooms[0];
-        rooms.RemoveAt(0);
-        RectInt roomA = room;
-        RectInt roomB = room;
-        roomA.width = room.width / 2;
-        roomB.xMin = (room.width / 2) + room.xMin - 1;
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            if (rooms[i].width > (minRoomSize.x * 2) + 2)
+            {
+                RectInt room = rooms[i];
+                float maxWidth = maxRoomSize.x;
+                if (rooms[i].width - minRoomSize.x < maxRoomSize.x)
+                {
+                    maxWidth = rooms[i].width - minRoomSize.x;
+                }
+                rooms.RemoveAt(i);
+                RectInt roomA = room;
+                RectInt roomB = room;
+                int randomValue = (int)Random.Range(minRoomSize.x + 2, maxWidth);
+                roomA.width = randomValue;
+                roomB.xMin = randomValue + room.xMin - 1;
 
 
-        rooms.Add(roomA);
-        rooms.Add(roomB);
+                rooms.Add(roomA);
+                rooms.Add(roomB);
+                break;
+            }
+        }
     }
 
     [Button]
     void SplitHorizontally()
     {
-        RectInt room = rooms[0];
-        rooms.RemoveAt(0);
-        RectInt roomA = room;
-        RectInt roomB = room;
-        roomA.height = room.height / 2;
-        roomB.yMin = (room.height / 2) + room.yMin - 1;
+        //RectInt room = rooms[0];
+        //rooms.RemoveAt(0);
+        //RectInt roomA = room;
+        //RectInt roomB = room;
+        //int randomValue = (int)Random.Range(minRoomSize.y, maxRoomSize.y);
+        //roomA.height = room.height / 2;
+        //roomB.yMin = (room.height / 2) + room.yMin - 1;
 
 
-        rooms.Add(roomA);
-        rooms.Add(roomB);
+        //rooms.Add(roomA);
+        //rooms.Add(roomB);
+
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            if (rooms[i].height > (minRoomSize.y * 2) + 2)
+            {
+                RectInt room = rooms[i];
+                float maxHeight = maxRoomSize.x;
+                if (rooms[i].height - minRoomSize.y < maxRoomSize.y)
+                {
+                    maxHeight = rooms[i].height - minRoomSize.y;
+                }
+                rooms.RemoveAt(i);
+                RectInt roomA = room;
+                RectInt roomB = room;
+                int randomValue = (int)Random.Range(minRoomSize.y + 2, maxHeight);
+                roomA.height = randomValue;
+                roomB.yMin = randomValue + room.yMin - 1;
+
+
+                rooms.Add(roomA);
+                rooms.Add(roomB);
+                break;
+            }
+        }
+    }
+
+    [Button]
+    void StartGenerating()
+    {
+        StartCoroutine(GenerateDungeon());
     }
 
     // Update is called once per frame
@@ -56,9 +102,9 @@ public class DungeonGenerator : MonoBehaviour
 
     IEnumerator GenerateDungeon()
     {
-        while(splitCount > 0)
+        while (true)
         {
-            if(Random.value < .5f)
+            if (Random.value < .5f)
             {
                 SplitVertically();
             }
@@ -66,8 +112,9 @@ public class DungeonGenerator : MonoBehaviour
             {
                 SplitHorizontally();
             }
-            yield return new WaitForSeconds(.2f);
-            splitCount--;
+            yield return new WaitForSeconds(.1f);
         }
+
+
     }
 }
