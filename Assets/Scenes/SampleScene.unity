@@ -471,8 +471,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   splitCount: 20
-  minRoomSize: {x: 0, y: 0}
-  maxRoomSize: {x: 0, y: 0}
+  minRoomSize: {x: 5, y: 5}
+  maxRoomSize: {x: 15, y: 15}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

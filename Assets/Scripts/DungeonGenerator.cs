@@ -1,6 +1,7 @@
 using NaughtyAttributes;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
@@ -20,28 +21,47 @@ public class DungeonGenerator : MonoBehaviour
     [Button]
     void SplitVertically()
     {
-        for (int i = 0; i < rooms.Count; i++)
+        //for (int i = 0; i < rooms.Count; i++)
+        //{
+        //    if (rooms[i].width > (minRoomSize.x * 2) + 2)
+        //    {
+        //        RectInt room = rooms[i];
+        //        float maxWidth = maxRoomSize.x;
+        //        if (rooms[i].width - minRoomSize.x < maxRoomSize.x)
+        //        {
+        //            maxWidth = rooms[i].width - minRoomSize.x;
+        //        }
+        //        rooms.RemoveAt(i);
+        //        RectInt roomA = room;
+        //        RectInt roomB = room;
+        //        int randomValue = (int)Random.Range(minRoomSize.x + 2, maxWidth);
+        //        roomA.width = randomValue;
+        //        roomB.xMin = randomValue + room.xMin - 1;
+
+
+        //        rooms.Add(roomA);
+        //        rooms.Add(roomB);
+        //        break;
+        //    }
+        //}
+        RectInt room = FindBiggestRoom(true);
+
+        if (room.width > (minRoomSize.x * 2) + 2)
         {
-            if (rooms[i].width > (minRoomSize.x * 2) + 2)
+            float maxWidth = maxRoomSize.x;
+            if (room.width - minRoomSize.x < maxRoomSize.x)
             {
-                RectInt room = rooms[i];
-                float maxWidth = maxRoomSize.x;
-                if (rooms[i].width - minRoomSize.x < maxRoomSize.x)
-                {
-                    maxWidth = rooms[i].width - minRoomSize.x;
-                }
-                rooms.RemoveAt(i);
-                RectInt roomA = room;
-                RectInt roomB = room;
-                int randomValue = (int)Random.Range(minRoomSize.x + 2, maxWidth);
-                roomA.width = randomValue;
-                roomB.xMin = randomValue + room.xMin - 1;
-
-
-                rooms.Add(roomA);
-                rooms.Add(roomB);
-                break;
+                maxWidth = room.width - minRoomSize.x;
             }
+            RectInt roomA = room;
+            RectInt roomB = room;
+            int randomValue = (int)Random.Range(minRoomSize.x + 2, maxWidth);
+            roomA.width = randomValue;
+            roomB.xMin = randomValue + room.xMin - 1;
+
+
+            rooms.Add(roomA);
+            rooms.Add(roomB);
         }
     }
 
@@ -89,6 +109,34 @@ public class DungeonGenerator : MonoBehaviour
     void StartGenerating()
     {
         StartCoroutine(GenerateDungeon());
+    }
+
+    void FindBiggestRoom(bool width)
+    {
+        RectInt biggestRoom = RectInt.zero;
+        int biggestRoomIndex = 0;
+        if (width)
+        {
+            for(int i = 0; i > rooms.Count; i++)
+            {
+                if (rooms[i].width > biggestRoom.width)
+                {
+                    biggestRoom = rooms[i];
+                    biggestRoomIndex = i;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i > rooms.Count; i++)
+            {
+                if (rooms[i].height > biggestRoom.height)
+                {
+                    biggestRoom = rooms[i];
+                    biggestRoomIndex = i;
+                }
+            }
+        }
     }
 
     // Update is called once per frame
