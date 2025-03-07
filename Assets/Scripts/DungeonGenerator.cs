@@ -9,10 +9,10 @@ using System;
 
 public class DungeonGenerator : MonoBehaviour
 {
-    public Vector2 dungeonSize;
-    public Vector2 minRoomSize;
-    public Vector2 maxRoomSize;
-    public Vector2 maxGererationSize;
+    public Vector2Int dungeonSize;
+    public Vector2Int minRoomSize;
+    public Vector2Int maxRoomSize;
+    public Vector2Int maxGererationSize;
     public int seed;
     public bool fastGeneration;
     [Range(0, .5f)]public float ChanceWeight;
@@ -31,7 +31,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private void Start()
     {
-        rooms = new List<RectInt>() { new RectInt(0, 0, (int)dungeonSize.x, (int)dungeonSize.y) };
+        rooms = new List<RectInt>() { new RectInt(0, 0, dungeonSize.x, dungeonSize.y) };
     }
 
     [Button]
@@ -44,7 +44,7 @@ public class DungeonGenerator : MonoBehaviour
         if (currentRoom.width > maxRoomSize.x + 2)
         {
             rooms.RemoveAt(biggestRoomIndex);
-            float maxWidth = maxRoomSize.x;
+            int maxWidth = maxRoomSize.x;
             if (currentRoom.width - minRoomSize.x < maxRoomSize.x)
             {
                 maxWidth = currentRoom.width - minRoomSize.x;
@@ -55,7 +55,7 @@ public class DungeonGenerator : MonoBehaviour
             }
             RectInt roomA = currentRoom;
             RectInt roomB = currentRoom;
-            int randomValue = (int)rng.NextInt((int)minRoomSize.x + 2, (int)maxWidth);
+            int randomValue = rng.NextInt(minRoomSize.x + 2, maxWidth);
             if(rng.NextFloat() < 0.5f)
             {
                 randomValue = currentRoom.width - randomValue;
@@ -82,7 +82,7 @@ public class DungeonGenerator : MonoBehaviour
 
         if (currentRoom.height > maxRoomSize.y + 2)
         {
-            float maxHeight = maxRoomSize.y;
+            int maxHeight = maxRoomSize.y;
             if (currentRoom.height - minRoomSize.y < maxRoomSize.y)
             {
                 maxHeight = currentRoom.height - minRoomSize.y;
@@ -94,7 +94,7 @@ public class DungeonGenerator : MonoBehaviour
             rooms.RemoveAt(biggestRoomIndex);
             RectInt roomA = currentRoom;
             RectInt roomB = currentRoom;
-            int randomValue = rng.NextInt((int)minRoomSize.y + 2, (int)maxHeight);
+            int randomValue = rng.NextInt(minRoomSize.y + 2, maxHeight);
             if (rng.NextFloat() < 0.5f)
             {
                 randomValue = currentRoom.height - randomValue;
@@ -124,7 +124,7 @@ public class DungeonGenerator : MonoBehaviour
         verticalDone = false;
         horizontalDone = false;
         stopGenerating = true;
-        rooms = new List<RectInt>() { new RectInt(0, 0, (int)dungeonSize.x, (int)dungeonSize.y) };
+        rooms = new List<RectInt>() { new RectInt(0, 0, dungeonSize.x, dungeonSize.y) };
     }
 
     int FindBiggestRoom(bool width)
@@ -227,18 +227,17 @@ public class DungeonGenerator : MonoBehaviour
             {
                 for (int j = i + 1; j < rooms.Count; j++)
                 {
-                    //doors.Add(AlgorithmsUtils.Intersect(rooms[i], rooms[j]));
                     RectInt intersect = AlgorithmsUtils.Intersect(rooms[i], rooms[j]);
                     if(intersect.width > 3)
                     {
+                        intersect.x += (intersect.width / 2) - 1;
                         intersect.width = 2;
-                        intersect.x += 1;
                         doors.Add(intersect);
                     }
                     else if(intersect.height > 3)
                     {
+                        intersect.y += (intersect.height / 2) - 1;
                         intersect.height = 2;
-                        intersect.y += 1;
                         doors.Add(intersect);
                     }
                 }
