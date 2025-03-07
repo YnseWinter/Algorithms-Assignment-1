@@ -3,19 +3,37 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Unity.Mathematics;
+using Random = Unity.Mathematics.Random;
+using System;
 
 public class DungeonGenerator : MonoBehaviour
 {
-    List<RectInt> rooms = new List<RectInt>() { new RectInt(0, 0, 100, 100) };
-    public int splitCount = 20;
+    public Vector2 dungeonSize;
     public Vector2 minRoomSize;
     public Vector2 maxRoomSize;
     public Vector2 maxGererationSize;
+    public int seed;
+    public bool fastGeneration;
+    [Range(0, .5f)]public float ChanceWeight;
 
+
+    List<RectInt> rooms = new List<RectInt>() { new RectInt(0, 0, 100, 100) };
+    List<RectInt> doors = new List<RectInt>() { new RectInt(0, 0, 0, 0) };
     private RectInt currentRoom;
 
     private bool verticalDone;
     private bool horizontalDone;
+    private bool stopGenerating;
+    private bool doneWithRooms;
+
+    Unity.Mathematics.Random rng;
+
+    private void Start()
+    {
+        rooms = new List<RectInt>() { new RectInt(0, 0, (int)dungeonSize.x, (int)dungeonSize.y) };
+    }
+
     [Button]
     void SplitVertically()
     {
@@ -37,7 +55,11 @@ public class DungeonGenerator : MonoBehaviour
             }
             RectInt roomA = currentRoom;
             RectInt roomB = currentRoom;
-            int randomValue = (int)Random.Range(minRoomSize.x + 2, maxWidth);
+            int randomValue = (int)rng.NextInt((int)minRoomSize.x + 2, (int)maxWidth);
+            if(rng.NextFloat() < 0.5f)
+            {
+                randomValue = currentRoom.width - randomValue;
+            }
             roomA.width = randomValue;
             roomB.xMin = randomValue + currentRoom.xMin - 1;
 
@@ -72,7 +94,11 @@ public class DungeonGenerator : MonoBehaviour
             rooms.RemoveAt(biggestRoomIndex);
             RectInt roomA = currentRoom;
             RectInt roomB = currentRoom;
-            int randomValue = (int)Random.Range(minRoomSize.y + 2, maxHeight);
+            int randomValue = rng.NextInt((int)minRoomSize.y + 2, (int)maxHeight);
+            if (rng.NextFloat() < 0.5f)
+            {
+                randomValue = currentRoom.height - randomValue;
+            }
             roomA.height = randomValue;
             roomB.yMin = randomValue + currentRoom.yMin - 1;
 
@@ -95,9 +121,10 @@ public class DungeonGenerator : MonoBehaviour
     [Button]
     void ResetDungeon()
     {
-        rooms = new List<RectInt>() { new RectInt(0, 0, 100, 100) };
         verticalDone = false;
         horizontalDone = false;
+        stopGenerating = true;
+        rooms = new List<RectInt>() { new RectInt(0, 0, (int)dungeonSize.x, (int)dungeonSize.y) };
     }
 
     int FindBiggestRoom(bool width)
@@ -151,29 +178,58 @@ public class DungeonGenerator : MonoBehaviour
         {
             AlgorithmsUtils.DebugRectInt(rooms[i], Color.blue);
         }
+        for (int i = 0; i < doors.Count; i++)
+        {
+            AlgorithmsUtils.DebugRectInt(doors[i], Color.yellow);
+        }
     }
 
     IEnumerator GenerateDungeon()
     {
+        rng = new Random(Convert.ToUInt32(seed));
         float weightedChanceValue = 0;
-        while (true)
+        while (!doneWithRooms)
         {
-            if ((Random.value + weightedChanceValue < .5f && !verticalDone) || (horizontalDone && !verticalDone))
+            if (stopGenerating)
+            {
+                stopGenerating = false;
+                break;
+            }
+            else if ((rng.NextFloat() + weightedChanceValue < .5f && !verticalDone) || (horizontalDone && !verticalDone))
             {
                 SplitVertically();
-                weightedChanceValue += .2f;
+                weightedChanceValue += ChanceWeight;
             }
             else if (!horizontalDone)
             {
                 SplitHorizontally();
-                weightedChanceValue -= .2f;
+                weightedChanceValue -= ChanceWeight;
             }
             else
             {
-                break;
+                doneWithRooms = true;
             }
-            //yield return new WaitForSeconds(.2f);
-            yield return null;
+
+            
+
+            if (fastGeneration)
+            {
+                yield return null;
+            }
+            else
+            {
+                yield return new WaitForSeconds(.2f);
+            }
+        }
+        if (doneWithRooms)
+        {
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                for (int j = i + 1; j < rooms.Count - 1; j++)
+                {
+                    doors.Add(AlgorithmsUtils.Intersect(rooms[i], rooms[j]));
+                }
+            }
         }
     }
 }

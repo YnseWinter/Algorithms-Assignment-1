@@ -470,10 +470,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6565a32427f92f40b020398c943db5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  splitCount: 20
+  dungeonSize: {x: 100, y: 100}
   minRoomSize: {x: 5, y: 5}
   maxRoomSize: {x: 20, y: 20}
   maxGererationSize: {x: 40, y: 40}
+  seed: 1
+  fastGeneration: 1
+  ChanceWeight: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
