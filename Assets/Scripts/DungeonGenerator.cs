@@ -279,14 +279,22 @@ public class DungeonGenerator : MonoBehaviour
             graph.AddNode(doorNodes[i]);
         }
 
-        for (int i = 0; i < rooms.Count; i++)
+        for (int i = 0; i < roomNodes.Count; i++)
         {
-            for (int j = 0; j < doors.Count; j++)
+            for (int j = 0; j < doorNodes.Count; j++)
             {
                 if(AlgorithmsUtils.Intersects(rooms[i], doors[j]))
                 {
                     graph.AddEdge(roomNodes[i], doorNodes[j]);
                 }
+            }
+        }
+
+        for (int i = 0; i < roomNodes.Count; i++)
+        {
+            if (graph.GetNeighbors(roomNodes[i]).Count == 0)
+            {
+                Debug.Log("Room: " + roomNodes[i] + " is not reachable");
             }
         }
 
