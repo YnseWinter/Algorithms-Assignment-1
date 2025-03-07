@@ -225,9 +225,22 @@ public class DungeonGenerator : MonoBehaviour
         {
             for (int i = 0; i < rooms.Count; i++)
             {
-                for (int j = i + 1; j < rooms.Count - 1; j++)
+                for (int j = i + 1; j < rooms.Count; j++)
                 {
-                    doors.Add(AlgorithmsUtils.Intersect(rooms[i], rooms[j]));
+                    //doors.Add(AlgorithmsUtils.Intersect(rooms[i], rooms[j]));
+                    RectInt intersect = AlgorithmsUtils.Intersect(rooms[i], rooms[j]);
+                    if(intersect.width > 3)
+                    {
+                        intersect.width = 2;
+                        intersect.x += 1;
+                        doors.Add(intersect);
+                    }
+                    else if(intersect.height > 3)
+                    {
+                        intersect.height = 2;
+                        intersect.y += 1;
+                        doors.Add(intersect);
+                    }
                 }
             }
         }
