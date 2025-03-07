@@ -4,6 +4,7 @@ public class GraphTester : MonoBehaviour
     void Start()
     {
         Graph<string> graph = new Graph<string>();
+        graph.AddNode("A");
         graph.AddNode("B");
         graph.AddNode("C");
         graph.AddNode("D");

@@ -17,15 +17,19 @@ public class DungeonGenerator : MonoBehaviour
     public bool fastGeneration;
     [Range(0, .5f)]public float ChanceWeight;
 
-
     List<RectInt> rooms = new List<RectInt>() { new RectInt(0, 0, 100, 100) };
-    List<RectInt> doors = new List<RectInt>() { new RectInt(0, 0, 0, 0) };
+    List<RectInt> doors = new List<RectInt>();
+    List<Vector2Int> roomNodes = new List<Vector2Int>();
+    List<Vector2Int> doorNodes = new List<Vector2Int>();
+
+    Graph<Vector2Int> graph = new Graph<Vector2Int>();
+
     private RectInt currentRoom;
 
     private bool verticalDone;
     private bool horizontalDone;
+    private bool doneGenerating;
     private bool stopGenerating;
-    private bool doneWithRooms;
 
     Unity.Mathematics.Random rng;
 
@@ -123,10 +127,15 @@ public class DungeonGenerator : MonoBehaviour
     {
         verticalDone = false;
         horizontalDone = false;
-        stopGenerating = true;
-        doneWithRooms = false;
+        if (!doneGenerating)
+        {
+            stopGenerating = true;
+        }
         rooms = new List<RectInt>() { new RectInt(0, 0, dungeonSize.x, dungeonSize.y) };
-        doors = new List<RectInt>() { new RectInt(0, 0, 0, 0) };
+        doors = new List<RectInt>();
+        roomNodes = new List<Vector2Int>();
+        doorNodes = new List<Vector2Int>();
+        Graph<Vector2Int> graph = new Graph<Vector2Int>();
     }
 
     int FindBiggestRoom(bool width)
@@ -184,17 +193,28 @@ public class DungeonGenerator : MonoBehaviour
         {
             AlgorithmsUtils.DebugRectInt(doors[i], Color.yellow);
         }
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            for (int j = 0; j < doors.Count; j++)
+            {
+                if (AlgorithmsUtils.Intersects(rooms[i], doors[j]))
+                {
+                    Debug.DrawLine(new Vector3(roomNodes[i].x, 0, roomNodes[i].y), new Vector3(doorNodes[j].x, 0, doorNodes[j].y), Color.red);
+                }
+            }
+        }
     }
 
     IEnumerator GenerateDungeon()
     {
         rng = new Random(Convert.ToUInt32(seed));
         float weightedChanceValue = 0;
-        while (!doneWithRooms)
+        while (true)
         {
             if (stopGenerating)
             {
                 stopGenerating = false;
+                Debug.Log("stup");
                 break;
             }
             else if ((rng.NextFloat() + weightedChanceValue < .5f && !verticalDone) || (horizontalDone && !verticalDone))
@@ -209,10 +229,8 @@ public class DungeonGenerator : MonoBehaviour
             }
             else
             {
-                doneWithRooms = true;
+                break;
             }
-
-            
 
             if (fastGeneration)
             {
@@ -223,27 +241,56 @@ public class DungeonGenerator : MonoBehaviour
                 yield return new WaitForSeconds(.2f);
             }
         }
-        if (doneWithRooms)
+
+        for (int i = 0; i < rooms.Count; i++)
         {
-            for (int i = 0; i < rooms.Count; i++)
+            for (int j = i + 1; j < rooms.Count; j++)
             {
-                for (int j = i + 1; j < rooms.Count; j++)
+                RectInt intersect = AlgorithmsUtils.Intersect(rooms[i], rooms[j]);
+                if (intersect.width > 3)
                 {
-                    RectInt intersect = AlgorithmsUtils.Intersect(rooms[i], rooms[j]);
-                    if(intersect.width > 3)
-                    {
-                        intersect.x += (intersect.width / 2) - 1;
-                        intersect.width = 2;
-                        doors.Add(intersect);
-                    }
-                    else if(intersect.height > 3)
-                    {
-                        intersect.y += (intersect.height / 2) - 1;
-                        intersect.height = 2;
-                        doors.Add(intersect);
-                    }
+                    intersect.x += (intersect.width / 2) - 1;
+                    intersect.width = 2;
+                    doors.Add(intersect);
+                }
+                else if (intersect.height > 3)
+                {
+                    intersect.y += (intersect.height / 2) - 1;
+                    intersect.height = 2;
+                    doors.Add(intersect);
+                }
+
+                if (!fastGeneration)
+                {
+                    yield return null;
                 }
             }
         }
+
+        for(int i = 0; i < rooms.Count; i++)
+        {
+            roomNodes.Add(new Vector2Int((rooms[i].width / 2) + rooms[i].x, (rooms[i].height / 2) + rooms[i].y));
+            graph.AddNode(roomNodes[i]);
+        }
+
+        for (int i = 0; i < doors.Count; i++)
+        {
+            doorNodes.Add(new Vector2Int(doors[i].x + 1, doors[i].y + 1));
+            graph.AddNode(doorNodes[i]);
+        }
+
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            for (int j = 0; j < doors.Count; j++)
+            {
+                if(AlgorithmsUtils.Intersects(rooms[i], doors[j]))
+                {
+                    graph.AddEdge(roomNodes[i], doorNodes[j]);
+                }
+            }
+        }
+
+        doneGenerating = true;
+        Debug.Log("Done");
     }
 }
