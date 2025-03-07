@@ -193,14 +193,11 @@ public class DungeonGenerator : MonoBehaviour
         {
             AlgorithmsUtils.DebugRectInt(doors[i], Color.yellow);
         }
-        for (int i = 0; i < rooms.Count; i++)
+        foreach(Vector2Int room in graph.adjacencyList.Keys)
         {
-            for (int j = 0; j < doors.Count; j++)
+            foreach(Vector2Int adjecantDoor in graph.GetNeighbors(room))
             {
-                if (AlgorithmsUtils.Intersects(rooms[i], doors[j]))
-                {
-                    Debug.DrawLine(new Vector3(roomNodes[i].x, 0, roomNodes[i].y), new Vector3(doorNodes[j].x, 0, doorNodes[j].y), Color.red);
-                }
+                Debug.DrawLine(new Vector3(room.x, 0, room.y), new Vector3(adjecantDoor.x, 0, adjecantDoor.y), Color.red);
             }
         }
     }
@@ -286,6 +283,11 @@ public class DungeonGenerator : MonoBehaviour
                 if(AlgorithmsUtils.Intersects(rooms[i], doors[j]))
                 {
                     graph.AddEdge(roomNodes[i], doorNodes[j]);
+                }
+
+                if (!fastGeneration)
+                {
+                    yield return null;
                 }
             }
         }

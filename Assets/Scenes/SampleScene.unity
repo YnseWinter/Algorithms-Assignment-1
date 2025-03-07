@@ -519,7 +519,7 @@ MonoBehaviour:
   maxRoomSize: {x: 20, y: 20}
   maxGererationSize: {x: 40, y: 40}
   seed: 4634346
-  fastGeneration: 1
+  fastGeneration: 0
   ChanceWeight: 0.254
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
