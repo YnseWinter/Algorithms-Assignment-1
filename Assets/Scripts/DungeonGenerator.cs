@@ -124,7 +124,9 @@ public class DungeonGenerator : MonoBehaviour
         verticalDone = false;
         horizontalDone = false;
         stopGenerating = true;
+        doneWithRooms = false;
         rooms = new List<RectInt>() { new RectInt(0, 0, dungeonSize.x, dungeonSize.y) };
+        doors = new List<RectInt>() { new RectInt(0, 0, 0, 0) };
     }
 
     int FindBiggestRoom(bool width)
