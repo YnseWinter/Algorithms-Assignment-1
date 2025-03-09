@@ -12,7 +12,6 @@ public class DungeonGenerator : MonoBehaviour
     public Vector2Int dungeonSize;
     public Vector2Int minRoomSize;
     public Vector2Int maxRoomSize;
-    public Vector2Int maxGererationSize;
     public int seed;
     public bool fastGeneration;
     [Range(0, .5f)]public float ChanceWeight;
@@ -41,32 +40,20 @@ public class DungeonGenerator : MonoBehaviour
     [Button]
     void SplitVertically()
     {
-        int biggestRoomIndex = FindBiggestRoom(true);
+        int biggestRoomIndex = FindBiggestRoomIndex(true);
 
         currentRoom = rooms[biggestRoomIndex];
 
         if (currentRoom.width > maxRoomSize.x + 2)
         {
             rooms.RemoveAt(biggestRoomIndex);
-            int maxWidth = maxRoomSize.x;
-            if (currentRoom.width - minRoomSize.x < maxRoomSize.x)
-            {
-                maxWidth = currentRoom.width - minRoomSize.x;
-            }
-            else if (currentRoom.width > maxGererationSize.x + minRoomSize.x)
-            {
-                maxWidth = maxGererationSize.x;
-            }
             RectInt roomA = currentRoom;
             RectInt roomB = currentRoom;
+
+            int maxWidth = currentRoom.width - minRoomSize.x;
             int randomValue = rng.NextInt(minRoomSize.x + 2, maxWidth);
-            if(rng.NextFloat() < 0.5f)
-            {
-                randomValue = currentRoom.width - randomValue;
-            }
             roomA.width = randomValue;
             roomB.xMin = randomValue + currentRoom.xMin - 1;
-
 
             rooms.Add(roomA);
             rooms.Add(roomB);
@@ -80,32 +67,20 @@ public class DungeonGenerator : MonoBehaviour
     [Button]
     void SplitHorizontally()
     {
-        int biggestRoomIndex = FindBiggestRoom(false);
+        int biggestRoomIndex = FindBiggestRoomIndex(false);
 
         currentRoom = rooms[biggestRoomIndex];
 
         if (currentRoom.height > maxRoomSize.y + 2)
         {
-            int maxHeight = maxRoomSize.y;
-            if (currentRoom.height - minRoomSize.y < maxRoomSize.y)
-            {
-                maxHeight = currentRoom.height - minRoomSize.y;
-            }
-            else if(currentRoom.height > maxGererationSize.y + minRoomSize.y)
-            {
-                maxHeight = maxGererationSize.y;
-            }
             rooms.RemoveAt(biggestRoomIndex);
             RectInt roomA = currentRoom;
             RectInt roomB = currentRoom;
+
+            int maxHeight = currentRoom.height - minRoomSize.y;
             int randomValue = rng.NextInt(minRoomSize.y + 2, maxHeight);
-            if (rng.NextFloat() < 0.5f)
-            {
-                randomValue = currentRoom.height - randomValue;
-            }
             roomA.height = randomValue;
             roomB.yMin = randomValue + currentRoom.yMin - 1;
-
 
             rooms.Add(roomA);
             rooms.Add(roomB);
@@ -135,10 +110,10 @@ public class DungeonGenerator : MonoBehaviour
         doors = new List<RectInt>();
         roomNodes = new List<Vector2Int>();
         doorNodes = new List<Vector2Int>();
-        Graph<Vector2Int> graph = new Graph<Vector2Int>();
+        graph = new Graph<Vector2Int>();
     }
 
-    int FindBiggestRoom(bool width)
+    int FindBiggestRoomIndex(bool width)
     {
         RectInt biggestRoom = RectInt.zero;
         int biggestRoomIndex = 0;
@@ -211,7 +186,6 @@ public class DungeonGenerator : MonoBehaviour
             if (stopGenerating)
             {
                 stopGenerating = false;
-                Debug.Log("stup");
                 break;
             }
             else if ((rng.NextFloat() + weightedChanceValue < .5f && !verticalDone) || (horizontalDone && !verticalDone))
@@ -244,13 +218,13 @@ public class DungeonGenerator : MonoBehaviour
             for (int j = i + 1; j < rooms.Count; j++)
             {
                 RectInt intersect = AlgorithmsUtils.Intersect(rooms[i], rooms[j]);
-                if (intersect.width > 3)
+                if (intersect.width >= 4)
                 {
                     intersect.x += (intersect.width / 2) - 1;
                     intersect.width = 2;
                     doors.Add(intersect);
                 }
-                else if (intersect.height > 3)
+                else if (intersect.height >= 4)
                 {
                     intersect.y += (intersect.height / 2) - 1;
                     intersect.height = 2;
