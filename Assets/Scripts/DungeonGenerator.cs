@@ -6,6 +6,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using Random = Unity.Mathematics.Random;
 using System;
+using System.Runtime.CompilerServices;
 
 public class DungeonGenerator : MonoBehaviour
 {
@@ -265,6 +266,16 @@ public class DungeonGenerator : MonoBehaviour
                 }
             }
         }
+
+        if (graph.DFS(roomNodes[0]).Count != roomNodes.Count + doorNodes.Count)
+        {
+            Debug.Log("Not all rooms are connected");
+        }
+        else
+        {
+            Debug.Log("All rooms are connected");
+        }
+
 
         //for (int i = 0; i < roomNodes.Count; i++)
         //{

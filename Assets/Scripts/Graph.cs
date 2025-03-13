@@ -107,10 +107,10 @@ public class Graph<T>
     }
 
     // Depth-First Search (DFS)
-    public void DFS(T startNode)
+    public List<T> DFS(T startNode)
     {
         Stack<T> stack = new();
-        HashSet<T> discovered = new();
+        List<T> discovered = new();
         stack.Push(startNode);
         while(stack.Count > 0)
         {
@@ -125,5 +125,6 @@ public class Graph<T>
                 }
             }
         }
+        return discovered;
     }
 }

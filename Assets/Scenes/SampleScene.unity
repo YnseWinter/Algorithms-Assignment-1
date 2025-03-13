@@ -529,7 +529,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dungeonSize: {x: 100, y: 100}
   minRoomSize: {x: 5, y: 5}
-  maxRoomSize: {x: 10, y: 10}
+  maxRoomSize: {x: 20, y: 20}
   seed: 4632864
   fastGeneration: 1
   ChanceWeight: 0.11
