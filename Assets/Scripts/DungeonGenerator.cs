@@ -266,12 +266,17 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < roomNodes.Count; i++)
+        //for (int i = 0; i < roomNodes.Count; i++)
+        //{
+        //    if (graph.GetNeighbors(roomNodes[i]).Count == 0)
+        //    {
+        //        Debug.Log("Room: " + roomNodes[i] + " is not reachable");
+        //    }
+        //}
+
+        for(int i = 0; i < rooms.Count; i++)
         {
-            if (graph.GetNeighbors(roomNodes[i]).Count == 0)
-            {
-                Debug.Log("Room: " + roomNodes[i] + " is not reachable");
-            }
+
         }
 
         doneGenerating = true;

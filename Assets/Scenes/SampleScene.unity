@@ -436,6 +436,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1151220098}
   - component: {fileID: 1151220097}
+  - component: {fileID: 1151220099}
   m_Layer: 0
   m_Name: GraphTester
   m_TagString: Untagged
@@ -450,7 +451,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1151220096}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a1670ed4a95ee774691083a491336944, type: 3}
   m_Name: 
@@ -470,6 +471,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1151220099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151220096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d237d48a04e11ba48a642f2917fb76a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1259550220
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,7 +530,6 @@ MonoBehaviour:
   dungeonSize: {x: 100, y: 100}
   minRoomSize: {x: 5, y: 5}
   maxRoomSize: {x: 10, y: 10}
-  maxGererationSize: {x: 40, y: 40}
   seed: 4632864
   fastGeneration: 1
   ChanceWeight: 0.11
