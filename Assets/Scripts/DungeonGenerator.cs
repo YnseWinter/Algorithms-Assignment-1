@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 
 public class DungeonGenerator : MonoBehaviour
 {
-    public Vector2Int dungeonSize;
+    public Vector2Int dungeonSize; 
     public Vector2Int minRoomSize;
     public Vector2Int maxRoomSize;
     public int seed;
@@ -38,6 +38,9 @@ public class DungeonGenerator : MonoBehaviour
         rooms = new List<RectInt>() { new RectInt(0, 0, dungeonSize.x, dungeonSize.y) };
     }
 
+    /// <summary>
+    /// Splits biggest based on width RectInt vertically at a random distance
+    /// </summary>
     [Button]
     void SplitVertically()
     {
@@ -65,6 +68,9 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// splits biggest RectInt based on height horizontally at a random distance
+    /// </summary>
     [Button]
     void SplitHorizontally()
     {
@@ -114,6 +120,11 @@ public class DungeonGenerator : MonoBehaviour
         graph = new Graph<Vector2Int>();
     }
 
+    /// <summary>
+    /// Returns the biggest room's index
+    /// </summary>
+    /// <param name="width"></param>
+    /// <returns></returns>
     int FindBiggestRoomIndex(bool width)
     {
         RectInt biggestRoom = RectInt.zero;
@@ -161,6 +172,7 @@ public class DungeonGenerator : MonoBehaviour
 
     void Update()
     {
+        //debugs entire dungeon
         for (int i = 0; i < rooms.Count; i++)
         {
             AlgorithmsUtils.DebugRectInt(rooms[i], Color.blue);
@@ -178,10 +190,16 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Generates entire dungeon
+    /// </summary>
+    /// <returns></returns>
     IEnumerator GenerateDungeon()
     {
         rng = new Random(Convert.ToUInt32(seed));
-        float weightedChanceValue = 0;
+        float weightedChanceValue = 0;  //
+
+        //generates all rooms by splitting the the dungeon randomly, splitting randomly between vertical and horizontal
         while (true)
         {
             if (stopGenerating)
@@ -214,6 +232,7 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
+        //calculates doors by finding the intersection of all rooms and determining if and where the door should be placed
         for (int i = 0; i < rooms.Count; i++)
         {
             for (int j = i + 1; j < rooms.Count; j++)
@@ -239,18 +258,21 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
+        //creates graph nodes for the rooms
         for(int i = 0; i < rooms.Count; i++)
         {
             roomNodes.Add(new Vector2Int((rooms[i].width / 2) + rooms[i].x, (rooms[i].height / 2) + rooms[i].y));
             graph.AddNode(roomNodes[i]);
         }
 
+        //creates graph nodes for the doors
         for (int i = 0; i < doors.Count; i++)
         {
             doorNodes.Add(new Vector2Int(doors[i].x + 1, doors[i].y + 1));
             graph.AddNode(doorNodes[i]);
         }
 
+        //adds edges for the graph using the nodes
         for (int i = 0; i < roomNodes.Count; i++)
         {
             for (int j = 0; j < doorNodes.Count; j++)
@@ -267,6 +289,7 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
+        //checks if all rooms are connected using the nodes
         if (graph.DFS(roomNodes[0]).Count != roomNodes.Count + doorNodes.Count)
         {
             Debug.Log("Not all rooms are connected");
@@ -274,20 +297,6 @@ public class DungeonGenerator : MonoBehaviour
         else
         {
             Debug.Log("All rooms are connected");
-        }
-
-
-        //for (int i = 0; i < roomNodes.Count; i++)
-        //{
-        //    if (graph.GetNeighbors(roomNodes[i]).Count == 0)
-        //    {
-        //        Debug.Log("Room: " + roomNodes[i] + " is not reachable");
-        //    }
-        //}
-
-        for(int i = 0; i < rooms.Count; i++)
-        {
-
         }
 
         doneGenerating = true;
