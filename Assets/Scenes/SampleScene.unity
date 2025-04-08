@@ -533,6 +533,8 @@ MonoBehaviour:
   seed: 4632864
   fastGeneration: 1
   ChanceWeight: 0.11
+  wall: {fileID: 3185444568816231464, guid: ff44e909db3b1894eb6351010982dc7e, type: 3}
+  floor: {fileID: 5257180661434268196, guid: d831480ce98b32f4fa8e6ac109339e78, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -16,6 +16,8 @@ public class DungeonGenerator : MonoBehaviour
     public int seed;
     public bool fastGeneration;
     [Range(0, .5f)]public float ChanceWeight;
+    public GameObject wall;
+    public GameObject floor;
 
     List<RectInt> rooms = new List<RectInt>() { new RectInt(0, 0, 100, 100) };
     List<RectInt> doors = new List<RectInt>();
@@ -233,7 +235,7 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         //calculates doors by finding the intersection of all rooms and determining if and where the door should be placed
-        for (int i = 0; i < rooms.Count; i++)
+        for (int i = 0; i < rooms.Count - 1; i++)
         {
             for (int j = i + 1; j < rooms.Count; j++)
             {
@@ -301,5 +303,89 @@ public class DungeonGenerator : MonoBehaviour
 
         doneGenerating = true;
         Debug.Log("Done");
+    }
+
+    [Button]
+    public void SpawnDungeonAssets()
+    {
+        Dictionary<GameObject, HashSet<Vector3Int>> walls = new();
+        Dictionary<GameObject, HashSet<Vector2Int>> floorTiles = new();
+        HashSet<Vector3Int> allWalls = new();
+        HashSet<Vector2Int> allFloorTiles = new();
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            GameObject room = new GameObject("Room: " + rooms[i].ToString());
+            walls.Add(room, new HashSet<Vector3Int>());
+            for (int j = 0; j < rooms[i].width; j++)
+            {
+                if (!allWalls.Contains(new Vector3Int(j + rooms[i].x, 0, rooms[i].y)))
+                {
+                    allWalls.Add(new Vector3Int(j + rooms[i].x, 0, rooms[i].y));
+                    walls[room].Add(new Vector3Int(j + rooms[i].x, 0, rooms[i].y));
+                }
+
+                if (!allWalls.Contains(new Vector3Int(j + rooms[i].x, 0, rooms[i].y + rooms[i].height - 1)))
+                {
+                    allWalls.Add(new Vector3Int(j + rooms[i].x, 0, rooms[i].y + rooms[i].height - 1));
+                    walls[room].Add(new Vector3Int(j + rooms[i].x, 0, rooms[i].y + rooms[i].height - 1));
+                }
+            }
+            for (int j = 0; j < rooms[i].height; j++)
+            {
+                if (!allWalls.Contains(new Vector3Int(rooms[i].x, 0, j + rooms[i].y)))
+                {
+                    allWalls.Add(new Vector3Int(rooms[i].x, 0, j + rooms[i].y));
+                    walls[room].Add(new Vector3Int(rooms[i].x, 0, j + rooms[i].y));
+                }
+
+                if (!allWalls.Contains(new Vector3Int(rooms[i].x + rooms[i].width - 1, 0, j + rooms[i].y)))
+                {
+                    allWalls.Add(new Vector3Int(rooms[i].x + rooms[i].width - 1, 0, j + rooms[i].y));
+                    walls[room].Add(new Vector3Int(rooms[i].x + rooms[i].width - 1, 0, j + rooms[i].y));
+                }
+            }
+
+            floorTiles.Add(room, new HashSet<Vector2Int>());
+            foreach (Vector2Int position in rooms[i].allPositionsWithin)
+            {
+                if (!allFloorTiles.Contains(position))
+                {
+                    allFloorTiles.Add(position);
+                    floorTiles[room].Add(position);
+                }
+            }
+        }
+
+        HashSet<Vector2Int> doorPositions = new();
+        foreach(RectInt door in doors)
+        {
+            foreach (Vector2Int pos in door.allPositionsWithin)
+            {
+                doorPositions.Add(pos);
+            }
+        }
+
+        foreach (KeyValuePair<GameObject, HashSet<Vector3Int>> theWall in walls)
+        {
+            foreach (Vector3Int position in theWall.Value)
+            {
+                Vector2Int position2D = new(position.x, position.z);
+
+                if (!doorPositions.Contains(position2D))
+                {
+                    GameObject actualWall = Instantiate(wall, position + new Vector3(0.5f, 0.5f, 0.5f), Quaternion.identity, theWall.Key.transform);
+                    actualWall.name = "Wall: " + position2D.ToString();
+                }
+            }
+        }
+
+        foreach (KeyValuePair<GameObject, HashSet<Vector2Int>> actualFloor in floorTiles)
+        {
+            foreach (Vector2Int position in actualFloor.Value)
+            {
+                GameObject theFloor = Instantiate(floor, new Vector3(position.x, 0, position.y) + new Vector3(0.5f, 0, 0.5f), Quaternion.Euler(90, 0, 0), actualFloor.Key.transform);
+                theFloor.name = "Floor: " + position.ToString();
+            }
+        }
     }
 }
