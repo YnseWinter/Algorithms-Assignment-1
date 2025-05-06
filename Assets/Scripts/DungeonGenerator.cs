@@ -7,6 +7,7 @@ using Unity.Mathematics;
 using Random = Unity.Mathematics.Random;
 using System;
 using System.Runtime.CompilerServices;
+using Unity.AI.Navigation;
 
 public class DungeonGenerator : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class DungeonGenerator : MonoBehaviour
     [Range(0, .5f)]public float ChanceWeight;
     public GameObject wall;
     public GameObject floor;
+    public NavMeshSurface navMeshSurface;
 
     List<RectInt> rooms = new List<RectInt>() { new RectInt(0, 0, 100, 100) };
     List<RectInt> doors = new List<RectInt>();
@@ -388,5 +390,11 @@ public class DungeonGenerator : MonoBehaviour
                 theFloor.name = "Floor: " + position.ToString();
             }
         }
+    }
+
+    [Button]
+    private void BakeNavMesh()
+    {
+        navMeshSurface.BuildNavMesh();
     }
 }
