@@ -242,13 +242,14 @@ public class DungeonGenerator : MonoBehaviour
                 RectInt intersect = AlgorithmsUtils.Intersect(rooms[i], rooms[j]);
                 if (intersect.width >= 4)
                 {
-                    intersect.x += (intersect.width / 2) - 1;
+                    //intersect.x += (intersect.width / 2) - 1;
+                    intersect.x += rng.NextInt(1, (intersect.width - 2));
                     intersect.width = 2;
                     doors.Add(intersect);
                 }
                 else if (intersect.height >= 4)
                 {
-                    intersect.y += (intersect.height / 2) - 1;
+                    intersect.y += rng.NextInt(1, (intersect.height - 2));
                     intersect.height = 2;
                     doors.Add(intersect);
                 }
