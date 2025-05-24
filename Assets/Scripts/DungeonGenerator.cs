@@ -315,9 +315,13 @@ public class DungeonGenerator : MonoBehaviour
         Dictionary<GameObject, HashSet<Vector2Int>> floorTiles = new();
         HashSet<Vector3Int> allWalls = new();
         HashSet<Vector2Int> allFloorTiles = new();
+
+        //Generate wall and floor positions
         for (int i = 0; i < rooms.Count; i++)
         {
             GameObject room = new GameObject("Room: " + rooms[i].ToString());
+
+            //Wall positions
             walls.Add(room, new HashSet<Vector3Int>());
             for (int j = 0; j < rooms[i].width; j++)
             {
@@ -348,6 +352,7 @@ public class DungeonGenerator : MonoBehaviour
                 }
             }
 
+            //Floor positions
             floorTiles.Add(room, new HashSet<Vector2Int>());
             foreach (Vector2Int position in rooms[i].allPositionsWithin)
             {
@@ -359,6 +364,7 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
+        //Generate door positions
         HashSet<Vector2Int> doorPositions = new();
         foreach(RectInt door in doors)
         {
@@ -368,6 +374,7 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
+        //Spawn walls, ignoring where door should be placed
         foreach (KeyValuePair<GameObject, HashSet<Vector3Int>> theWall in walls)
         {
             foreach (Vector3Int position in theWall.Value)
@@ -382,12 +389,18 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
+        //Spawn floor
         foreach (KeyValuePair<GameObject, HashSet<Vector2Int>> actualFloor in floorTiles)
         {
             foreach (Vector2Int position in actualFloor.Value)
             {
-                GameObject theFloor = Instantiate(floor, new Vector3(position.x, 0, position.y) + new Vector3(0.5f, 0, 0.5f), Quaternion.Euler(90, 0, 0), actualFloor.Key.transform);
-                theFloor.name = "Floor: " + position.ToString();
+                Vector3Int position3 = new(position.x, 0, position.y);
+
+                if (!allWalls.Contains(position3))
+                {
+                    GameObject theFloor = Instantiate(floor, new Vector3(position.x, 0, position.y) + new Vector3(0.5f, 0, 0.5f), Quaternion.Euler(90, 0, 0), actualFloor.Key.transform);
+                    theFloor.name = "Floor: " + position.ToString();
+                }
             }
         }
     }
