@@ -396,7 +396,7 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Vector3Int position3 = new(position.x, 0, position.y);
 
-                if (!allWalls.Contains(position3))
+                if (!allWalls.Contains(position3) || doorPositions.Contains(position))
                 {
                     GameObject theFloor = Instantiate(floor, new Vector3(position.x, 0, position.y) + new Vector3(0.5f, 0, 0.5f), Quaternion.Euler(90, 0, 0), actualFloor.Key.transform);
                     theFloor.name = "Floor: " + position.ToString();
